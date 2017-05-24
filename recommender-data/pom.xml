@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>recommender-system</artifactId>
+        <groupId>pro.boto</groupId>
+        <version>1.0-SNAPSHOT</version>
+        <relativePath>../recommender-system/pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>recommender-data</artifactId>
+    <packaging>jar</packaging>
+    <name>recommender data module</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>pro.boto</groupId>
+            <artifactId>recommender-configuration</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>pro.boto</groupId>
+            <artifactId>flink-connector-kudu</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>src/main/scala</sourceDirectory>
+        <testSourceDirectory>src/test/scala</testSourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.scala-tools</groupId>
+                <artifactId>maven-scala-plugin</artifactId>
+                <version>2.15.2</version>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
