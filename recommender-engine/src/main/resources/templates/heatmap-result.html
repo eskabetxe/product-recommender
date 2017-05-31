@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Heatmap</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"
+              integrity="sha512-07I2e+7D8p6he1SIM+1twR5TIrhUQn9+I6yjqD53JQjFiMf8EtC93ty0/5vJTZGF8aAocvHYNEDJajGdNx1IsQ=="
+              crossorigin=""/>
+        <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"
+                integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg=="
+                crossorigin=""></script>
+
+        <link rel="stylesheet" type="text/css" href="https://unpkg.com/leaflet.markercluster@1.0.5/dist/MarkerCluster.css" />
+        <link rel="stylesheet" type="text/css" href="https://unpkg.com/leaflet.markercluster@1.0.5/dist/MarkerCluster.Default.css" />
+        <script src="https://unpkg.com/leaflet.markercluster@1.0.5/dist/leaflet.markercluster-src.js"></script>
+
+
+        <link rel="stylesheet" type="text/css" th:href="@{/css/recommender.css}" />
+        <script type="text/javascript" th:src="@{/js/recommender.js}" />
+        <script type="text/javascript" th:src="@{/js/heatmap.min.js}" />
+        <script type="text/javascript" th:src="@{/js/leaflet-heatmap.js}" />
+    </head>
+    <body>
+        <div id="mapTopLeft"></div><div id="mapTopRifht"></div>
+        <div id="mapDownLeft"></div><div id="mapDownRifht"></div>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+        <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    </body>
+    <script type="text/javascript" th:inline="javascript">
+/*<![CDATA[*/
+
+        var startpoint = L.latLng(39.5000000, -8.0000000);
+        var saved = JSON.parse([[${saved}]]);
+        var contacts = JSON.parse([[${contacts}]]);
+        var shares = JSON.parse([[${shares}]]);
+        var views = JSON.parse([[${views}]]);
+
+        heatMap(saved,mapTopLeft,'saved');
+        heatMap(contacts,mapTopRifht,'contacts');
+        heatMap(shares,mapDownLeft,'shares');
+        heatMap(views,mapDownRifht,'views');
+
+        function heatMap(data, mapName, mapText) {
+            var baseLayer = L.tileLayer(
+                'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: mapText,
+                    maxZoom: 12
+                }
+            );
+
+            var cfg = {
+                // radius should be small ONLY if scaleRadius is true (or small radius is intended)
+                // if scaleRadius is false it will be the constant radius used in pixels
+                "radius": 10,
+                "maxOpacity": .8,
+                // scales the radius based on map zoom
+                "scaleRadius": false,
+                // if set to false the heatmap uses the global maximum for colorization
+                // if activated: uses the data maximum within the current map boundaries
+                //   (there will always be a red spot with useLocalExtremas true)
+                "useLocalExtrema": true,
+                // which field name in your data represents the latitude - default "lat"
+                latField: 'latitude',
+                // which field name in your data represents the longitude - default "lng"
+                lngField: 'longitude',
+                // which field name in your data represents the data value - default "value"
+                valueField: 'actions'
+            };
+
+
+            var heatmapLayer = new HeatmapOverlay(cfg);
+
+            var map = new L.Map(mapName, {
+                center: new L.LatLng(39.5000000, -8.0000000),
+                zoom: 6,
+                layers: [baseLayer, heatmapLayer]
+            });
+
+            var testData = {
+                max: 8,
+                data: data
+            };
+
+
+            heatmapLayer.setData(testData);
+        }
+
+/*]]>*/
+    </script>
+</html>

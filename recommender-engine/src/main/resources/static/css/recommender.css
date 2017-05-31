@@ -1,0 +1,21 @@
+#mapFull {
+    height: 100%;
+    width: 100%;
+    float:left;
+}
+#mapHalfLeft, #mapHalfRifht {
+    height: 100%;
+    width: 50%;
+    float:left;
+}
+#mapTopLeft, #mapTopRifht, #mapDownLeft, #mapDownRifht {
+    height: 50%;
+    width: 50%;
+    float:left;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
