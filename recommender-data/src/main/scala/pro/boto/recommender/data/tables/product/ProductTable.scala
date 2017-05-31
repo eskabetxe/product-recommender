@@ -3,7 +3,6 @@ package pro.boto.recommender.data.tables.product
 import org.apache.kudu.Type
 import pro.boto.flink.connector.kudu.KuduException
 import pro.boto.flink.connector.kudu.schema.{KuduColumn, KuduTable}
-import pro.boto.recommender.data.ConfigData
 import pro.boto.recommender.data.tables.BaseKuduTable
 
 
