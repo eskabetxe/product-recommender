@@ -1,0 +1,25 @@
+sot:
+  basepath: /home/boto/Dropbox/kschool/SoT/v2/2017/05/
+  filename: /property_actions.sot
+  charset: UTF-8
+
+kudu:
+  master: 172.25.0.6
+  replicas: 3
+  actionsTable: useractions
+  ratingsTable: userratings
+  predictionsTable: userpredictions
+
+kafka:
+  host: 172.25.0.5:9092
+  acks: 1
+  topic: userevents
+  groupId: productRecommender
+
+zookeeper:
+  master: 172.25.0.3
+  port: 2181
+
+drill:
+  master: 172.25.0.4:31010
+  schema: kudu
