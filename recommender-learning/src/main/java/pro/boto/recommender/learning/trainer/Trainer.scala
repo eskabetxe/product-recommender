@@ -5,6 +5,7 @@ import org.apache.spark.ml.recommendation.{ALS, ALSModel}
 import org.apache.spark.ml.{Pipeline, PipelineModel}
 import org.apache.spark.sql.functions.{col, max, sum}
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import pro.boto.recommender.configuration.{HdfsConfig, RecommenderConfig}
 import pro.boto.recommender.data.tables.action.ActionColumn
 import pro.boto.recommender.learning.domain.Rater
 import pro.boto.recommender.learning.persistence.{ActionTable, SparkFactory}
@@ -32,10 +33,8 @@ object Trainer {
       .cache()
 
     val pipeModel = Trainer.testing(ratings)
-
-    //pipeModel.save("hdfs://172.25.0.2:9000/tmp")
-
-    //Trainer.train(ratings, new ModelParam(20,50,0.1))
+    //val pipeModel = new ModelParam(20,50,0.1)
+    Trainer.train(ratings, pipeModel)
 
   }
 
@@ -49,9 +48,9 @@ object Trainer {
     val training = splits(0).cache()
     val test = splits(1).cache()
 
-    val ranks = List(50)
-    val lambdas = List(0.1)
-    val numIters = List(20)
+    val ranks = List(30,40,50)
+    val lambdas = List(0.1,0.2,0.3)
+    val numIters = List(10,15,20)
     var bestParams: Option[ModelParam] = None
     var bestRmse = Double.MaxValue
     var bestTime: Long = 0
@@ -76,9 +75,6 @@ object Trainer {
     println("<--- BEST RESULT --->");
     println("Params = " + bestParams.get.toString +" with RMSE " + bestRmse + " on " +bestTime/1000 +"s")
 
-    val f =ProductRecommender.calculateProductRecs(3,model)
-    f.take(10);
-
     return bestParams.get
 
   }
@@ -101,11 +97,16 @@ object Trainer {
 
   def train(ratings: DataFrame, param: ModelParam): Unit = {
 
+    val hdfsConfig = RecommenderConfig.obtainHdfsConfig();
+
     val model = modelTrain(ratings, param)
+    val path = "hdfs://"+hdfsConfig.master()+"/"+hdfsConfig.basepath()
 
     //model.save("/home/boto/tmp/model/save")
-    //model.save("hdfs://172.25.0.2:9000/tmp")
-   // model.write.overwrite().save()
+    model.write.overwrite().save("/home/boto/tmp/model/save")
+
+    //val f =ProductRecommender.calculateProductRecs(10,model)
+
 
   }
 

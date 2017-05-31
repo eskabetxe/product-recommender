@@ -8,9 +8,14 @@ public class RecommenderConfig {
     private final static String CONFIG_KAFKA = "kafka";
     private final static String CONFIG_KUDU = "kudu";
     private final static String CONFIG_DRILL = "drill";
+    private final static String CONFIG_HDFS = "hdfs";
 
     public static ZookeeperConfig obtainZookeeperConfig(){
         return configurations.bind(CONFIG_ZOOKEEPER, ZookeeperConfig.class);
+    }
+
+    public static HdfsConfig obtainHdfsConfig(){
+        return configurations.bind(CONFIG_HDFS, HdfsConfig.class);
     }
 
     public static KafkaConfig obtainKafkaConfig(){

@@ -3,6 +3,10 @@ sot:
   filename: /property_actions.sot
   charset: UTF-8
 
+hdfs:
+  master: 172.25.0.2:9000
+  basepath: tmp
+
 kudu:
   master: 172.25.0.6
   replicas: 3
