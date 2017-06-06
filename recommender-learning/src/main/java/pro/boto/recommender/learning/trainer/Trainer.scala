@@ -15,6 +15,7 @@ object Trainer {
 
   case class ModelParam(iterations:Int, rank:Int, lambda:Double)
 
+
   def main(args: Array[String]): Unit = {
 
     val sparkSession = SparkFactory.getOrCreateSession()
@@ -28,12 +29,13 @@ object Trainer {
         sum(ActionColumn.views).as(ActionColumn.views),
         sum(ActionColumn.contacts).as(ActionColumn.contacts),
         sum(ActionColumn.shares).as(ActionColumn.shares))
+      .filter(r => r.getAs[String](ActionColumn.userId).startsWith("U"))
       .map(p => Rater.obtainRating(p))
       .toDF()
       .cache()
 
-    val pipeModel = Trainer.testing(ratings)
-    //val pipeModel = new ModelParam(20,50,0.1)
+    //val pipeModel = Trainer.testing(ratings)
+    val pipeModel = new ModelParam(20,50,0.1)
     Trainer.train(ratings, pipeModel)
 
   }
@@ -110,7 +112,8 @@ object Trainer {
 
   }
 
-  def modelTrain(ratings: DataFrame, param: ModelParam): ALSModel = {
+
+  def modelTrain2(ratings: DataFrame, param: ModelParam): ALSModel = {
     val als = new ALS()
       .setMaxIter(param.iterations)
       .setRank(param.rank)
@@ -120,6 +123,19 @@ object Trainer {
       .setRatingCol(Rater.RATING_COLUMN)
   //  val stages = Array(als)
   //  val pipeline = new Pipeline().setStages(stages)
+
+    return als.fit(ratings)
+  }
+
+
+  def modelTrain(ratings: DataFrame, param: ModelParam): ALSModel = {
+    val als = new ALS()
+      .setMaxIter(param.iterations)
+      .setRank(param.rank)
+      .setRegParam(param.lambda)
+      .setUserCol(Rater.USER_COLUMN)
+      .setItemCol(Rater.PRODUCT_COLUMN)
+      .setRatingCol(Rater.RATING_COLUMN)
 
     return als.fit(ratings)
   }

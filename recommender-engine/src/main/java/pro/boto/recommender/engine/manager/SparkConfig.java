@@ -1,10 +1,13 @@
 package pro.boto.recommender.engine.manager;
 
 import org.apache.spark.ml.PipelineModel;
+import org.apache.spark.ml.recommendation.ALSModel;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.StructType;
+import pro.boto.recommender.configuration.HdfsConfig;
+import pro.boto.recommender.configuration.RecommenderConfig;
 
 import java.util.List;
 
@@ -27,9 +30,11 @@ public class SparkConfig {
                 .createDataFrame(tuples, type);
 
     }
-    public static PipelineModel obtainModel(){
+    public static ALSModel obtainModel(){
         SparkSession spark = obtainSession();
-        return PipelineModel.load("/home/boto/tmp/model/save");
+        HdfsConfig config = RecommenderConfig.obtainHdfsConfig();
+        String path = "hdfs://"+config.master()+"/"+config.basepath();
+        return ALSModel.load(path);
     }
 
 }

@@ -1,6 +1,7 @@
 package pro.boto.recommender.engine.manager;
 
 import org.apache.spark.ml.PipelineModel;
+import org.apache.spark.ml.recommendation.ALSModel;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.RowFactory;
@@ -21,7 +22,7 @@ public class PredictManager {
     private final String PREDICTION = "prediction";
     private final Integer PREDICITON_MIN = 3;
 
-    private PipelineModel model;
+    private ALSModel model;
     private StructType struct;
 
 

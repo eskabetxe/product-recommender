@@ -1,6 +1,7 @@
 package pro.boto.recommender.engine.drill;
 
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -48,31 +49,44 @@ public class ProductConnector extends DrillConnector {
         }
     }
 
-    private final static String QUERY_PRODUCTS_PREDICT_BY_USER =
-            " select t.* " +
-            " from kudu.products t " +
-            " where t.productid not in ( " +
-            "  select distinct r.productid " +
-            "  from kudu.userevents r " +
-            "  where r.userid='%s' " +
-            " ) ";
-    private final static String QUERY_PRODUCTS_PREDICT_LIMIT =
-            " and %s in ( " +
-            "  select p.%s " +
-            "  from kudu.useractions r " +
-            "  inner join kudu.products p on p.productid=r.productid  " +
-            "  where r.userid = '%s'  " +
-            "  group by p.%s " +
-            " ) ";
+
+    private final static String QUERY_PRODUCTS_SEEN_BY_USER =
+            " with actions as ( " +
+            "  select z.productid,z.districto,z.concelho,z.freguesia,z.operation " +
+            "  from kudu.products z " +
+            "  inner join kudu.useractions a on a.productid=z.productid " +
+            "  where a.userid='%s' " +
+            ") " +
+            "select p.* " +
+            "from kudu.products p " +
+            "where (p.%s,p.operation) in ( " +
+            "  select a.%s,a.operation " +
+            "  from actions a " +
+            ") " +
+            "and p.productid not in ( " +
+            "  select a.productid " +
+            "  from actions a " +
+            ") "
+            ;
     public List<Product> obtainToPredict(String userId, String limit)  {
         try {
-            String query = String.format(QUERY_PRODUCTS_PREDICT_BY_USER,userId);
-            if("freguesia".equalsIgnoreCase(limit)
-                    || "concelho".equalsIgnoreCase(limit)
-                    || "districto".equalsIgnoreCase(limit)){
-                query += String.format(QUERY_PRODUCTS_PREDICT_LIMIT,limit,limit,userId,limit);
+            List<String> limits = new ArrayList<>();
+            if("districto".equalsIgnoreCase(limit)){
+                limits.add("districto");
+            }
+            if("concelho".equalsIgnoreCase(limit)){
+                limits.add("districto");
+                limits.add("concelho");
+            }
+            if("freguesia".equalsIgnoreCase(limit)){
+                limits.add("districto");
+                limits.add("concelho");
+                limits.add("freguesia");
             }
 
+            String query = String.format(QUERY_PRODUCTS_SEEN_BY_USER,userId,
+                    StringUtils.join(limits, ",p."),
+                    StringUtils.join(limits, ",a."));
             ResultSet rs = executeQuery(query);
             return mapProducts(rs);
         } catch (SQLException e) {

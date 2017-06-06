@@ -35,13 +35,10 @@ public class AcquisitionAsyncMain {
     }
 
     public void start() throws Exception {
-
-        // set up the execution environment
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
         env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
         env.enableCheckpointing(5000);
-       // env.setParallelism(20);
 
         DataStreamSource<String> source = env.addSource(KafkaConsumer.obtain());
 
